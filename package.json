@@ -1,0 +1,17 @@
+{
+  "name": "discotty",
+  "version": "1.0.0",
+  "description": "This is a discord bit where I can learn and test different features using node.js and discord.js",
+  "main": "bot.js",
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "eslint": "^7.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
