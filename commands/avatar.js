@@ -2,7 +2,7 @@ module.exports = {
     name: 'avatar',
     aliases:["icon","pfp"],
 	description: 'shows a users pfp url',
-    execute(message, args) {		
+    execute(message) {		
         if(!message.mentions.users.size){
             return message.channel.send(`Your avatar: <${message.author.displayAvatarURL({format: "png", dynamic: true})}>`);
         }

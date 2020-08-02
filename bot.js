@@ -5,6 +5,9 @@ client.commands= new Discord.Collection();
 const commandFiles= fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns= new Discord.Collection();
 
+//REACTIONS UP NEXT
+//Also !purge ## doesn't work
+
 try {
 	var config = require("./key.json");
 } catch (e){
@@ -19,8 +22,7 @@ client.once("ready", () => {
 for(const file of commandFiles){
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name,command);
-};
-
+}
 
 client.on("message",message =>{
 	if(!message.content.startsWith(config.prefix) || message.author.bot){
@@ -28,16 +30,16 @@ client.on("message",message =>{
 	}
 	const args= message.content.slice(config.prefix.length).trim().split(/ +/);
 	const botCommand= args.shift().toLowerCase();
-	const cmdFile= client.commands.get(botCommand) 
-			|| client.commands.find(cmd=> cmd.aliases && cmd.aliases.includes(botCommand));
-	if(!botCommand){
-		return;
+	const cmdFile= client.commands.get(botCommand) || client.commands.find(cmd=> cmd.aliases && cmd.aliases.includes(botCommand));
+
+	if(!cmdFile){
+		return message.channel.send("The command you tried to enter was not a vaild command type !help for a list of all the commands");
 	}
 
 	if(cmdFile.args && !args.length){
 		let reply = `Error: You didn't provide any arguments`;
 		if(cmdFile.usage){
-			reply+= `\nThe proper usage would be: \`${prefix}${botCommand} ${cmdFile.usage}\``;
+			reply+= `\nThe proper usage would be: \`${config.prefix}${botCommand} ${cmdFile.usage}\``;
 		}
 		return message.channel.send(reply);
 	}
@@ -72,42 +74,16 @@ client.on("message",message =>{
 	setTimeout(() => timestamp.delete(message.author.id), cooldownAmount);
 
 
-
 	try{
 		cmdFile.execute(message,args);
 	} catch(err){
 		console.error(err);
 		message.reply("There was an error while trying to run the command");
 	}
-
-	//Embeds is next
-
-	/*
-	//Tells the user the server name and amount of people in the server
-	if(botCommand==="server"){
-		message.channel.send(`You are in ${message.guild.name}\nThere are ${message.guild.memberCount-1} members in the server`);
-	}
-
-	//Bulk deletes 2-100 messages dependent on the number the user specified 
-	else if(botCommand==="prune"){
-		const amount = parseInt(args[0]);
-		if(isNaN(amount)){
-			return message.reply("That doesn't seem to be a valid number");
-		}
-		else if(amount<2||amount>100){
-			return message.reply("You must enter a number between 2-100");
-		}
-		else{
-			message.channel.bulkDelete(amount, true).catch(err=> {
-				console.error(err);
-				message.channel.send("Unforntunatlly I have ran into an error while trying to prune the channel");
-			});
-		}
-		message.channel.send(`I have successfully purned ${amount} messages from the channel`);
-	}
-*/
 });
 
-
+process.on('unhandledRejection', error => {
+	console.error('Unhandled promise rejection:', error);
+});
 
 client.login(config.token);
