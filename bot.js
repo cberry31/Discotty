@@ -4,9 +4,10 @@ const client= new Discord.Client();
 client.commands= new Discord.Collection();
 const commandFiles= fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns= new Discord.Collection();
+const Canvas = require("canvas");
 
-//REACTIONS UP NEXT
-//Also !purge ## doesn't work
+//TODOs
+//UP NEXT: Common ?s: Misc.
 
 try {
 	var config = require("./key.json");
@@ -30,24 +31,20 @@ client.on("message",message =>{
 	}
 	const args= message.content.slice(config.prefix.length).trim().split(/ +/);
 	const botCommand= args.shift().toLowerCase();
-	const cmdFile= client.commands.get(botCommand) || client.commands.find(cmd=> cmd.aliases && cmd.aliases.includes(botCommand));
+	const cmdFile = client.commands.get(botCommand) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(botCommand));
 
 	if(!cmdFile){
 		return message.channel.send("The command you tried to enter was not a vaild command type !help for a list of all the commands");
 	}
-
+	
 	if(cmdFile.args && !args.length){
 		let reply = `Error: You didn't provide any arguments`;
 		if(cmdFile.usage){
-			reply+= `\nThe proper usage would be: \`${config.prefix}${botCommand} ${cmdFile.usage}\``;
+			reply+= `\nThe proper usage would be: \`${config.prefix}${cmdFile.name} ${cmdFile.usage}\``;
 		}
 		return message.channel.send(reply);
 	}
-
-	if(!client.commands.has(botCommand)){
-		return;
-	}
-
+	
 	if(cmdFile.guildOnly && message.channel.type!=="text"){
 		return message.reply("I cannot execute this command inside DMs");
 	}
@@ -73,13 +70,18 @@ client.on("message",message =>{
 	timestamp.set(message.author.id, now);
 	setTimeout(() => timestamp.delete(message.author.id), cooldownAmount);
 
-
 	try{
 		cmdFile.execute(message,args);
 	} catch(err){
 		console.error(err);
 		message.reply("There was an error while trying to run the command");
 	}
+});
+
+client.on("guildMemberAdd", (member) => {
+	let guild = member.guild;
+	guild.systemChannel.send(`Welcome to the server ${member}`);
+	member.send(`Hello and welcome to ${guild.name}`);
 });
 
 process.on('unhandledRejection', error => {

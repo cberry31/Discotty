@@ -2,7 +2,7 @@
 
 module.exports={
     name:"prune",
-    aliases:["purge"],
+    aliases:['purge'],
     description:"remove messages in the current channel",
     args: true,
     execute(message,args){
