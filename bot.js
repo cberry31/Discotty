@@ -5,6 +5,15 @@ client.commands= new Discord.Collection();
 const commandFiles= fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns= new Discord.Collection();
 const Canvas = require("canvas");
+const ytdl = require('ytdl-core');
+const winston = require("winston");
+const logger = winston.createLogger({
+	transports: [
+		new winston.transports.Console(),
+		new winston.transports.File({ filename: 'log' }),
+	],
+	format: winston.format.printf(log => `[${log.level.toUpperCase()}] - ${log.message}`),
+});
 
 //TODOs
 //UP NEXT: Common ?s: Misc.
@@ -12,12 +21,12 @@ const Canvas = require("canvas");
 try {
 	var config = require("./key.json");
 } catch (e){
-	console.log("Please create an auth.json like auth.json.example with a bot token or an email and password.\n"+e.stack); // send message for error - no token 
+	logger.log('error', "Please create an auth.json like auth.json.example with a bot token or an email and password.\n"+e.stack); // send message for error - no token 
 	process.exit(); 
 }
 
 client.once("ready", () => {
-	console.log("Ready!");
+	logger.log('info', 'The bot is online');
 });
 
 for(const file of commandFiles){
@@ -73,7 +82,7 @@ client.on("message",message =>{
 	try{
 		cmdFile.execute(message,args);
 	} catch(err){
-		console.error(err);
+		logger.log('error',err);
 		message.reply("There was an error while trying to run the command");
 	}
 });
@@ -85,7 +94,7 @@ client.on("guildMemberAdd", (member) => {
 });
 
 process.on('unhandledRejection', error => {
-	console.error('Unhandled promise rejection:', error);
+	logger.log('error','Unhandled promise rejection:', error);
 });
 
 client.login(config.token);
