@@ -4,8 +4,8 @@ const client= new Discord.Client();
 client.commands= new Discord.Collection();
 const commandFiles= fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 const cooldowns= new Discord.Collection();
-const Canvas = require("canvas");
-const ytdl = require('ytdl-core');
+//const Canvas = require("canvas");
+//const ytdl = require('ytdl-core');
 const winston = require("winston");
 const logger = winston.createLogger({
 	transports: [
